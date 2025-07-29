@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -291,9 +292,15 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
      */
     private final MavenProject project;
 
-    protected AbstractAnalyzeMojo(PlexusContainer plexusContainer, MavenProject project) {
+    /**
+     * The Maven project to analyze.
+     */
+    private final MavenSession session;
+
+    protected AbstractAnalyzeMojo(PlexusContainer plexusContainer, MavenProject project, MavenSession session) {
         this.plexusContainer = plexusContainer;
         this.project = project;
+        this.session = session;
     }
 
     // Mojo methods -----------------------------------------------------------
@@ -351,7 +358,8 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
     private boolean checkDependencies() throws MojoExecutionException {
         ProjectDependencyAnalysis analysis;
         try {
-            analysis = createProjectDependencyAnalyzer().analyze(project, excludedClasses);
+            analysis = createProjectDependencyAnalyzer()
+                    .analyze(project, session.getProjectBuildingRequest(), excludedClasses);
 
             if (usedDependencies != null) {
                 analysis = analysis.forceDeclaredDependenciesUsage(usedDependencies);

@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import java.util.Locale;
 import java.util.Set;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -55,6 +56,12 @@ public class AnalyzeReport extends AbstractMavenReport {
      * Internationalization component
      */
     private final I18N i18n;
+
+    /**
+     * The Maven Session.
+     */
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    protected MavenSession session;
 
     /**
      * Ignore Runtime/Provided/Test/System scopes for unused dependency analysis
@@ -105,7 +112,7 @@ public class AnalyzeReport extends AbstractMavenReport {
         // Step 1: Analyze the project
         ProjectDependencyAnalysis analysis;
         try {
-            analysis = analyzer.analyze(project, excludedClasses);
+            analysis = analyzer.analyze(project, session.getProjectBuildingRequest(), excludedClasses);
 
             if (usedDependencies != null) {
                 analysis = analysis.forceDeclaredDependenciesUsage(usedDependencies);
