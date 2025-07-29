@@ -20,6 +20,7 @@ package org.apache.maven.plugins.dependency.analyze;
 
 import javax.inject.Inject;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -52,7 +53,7 @@ public class AnalyzeOnlyMojo extends AbstractAnalyzeMojo {
     // subclassed to provide annotations
 
     @Inject
-    public AnalyzeOnlyMojo(PlexusContainer plexusContainer, MavenProject project) {
-        super(plexusContainer, project);
+    public AnalyzeOnlyMojo(PlexusContainer plexusContainer, MavenProject project, MavenSession session) {
+        super(plexusContainer, project, session);
     }
 }
