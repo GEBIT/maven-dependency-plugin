@@ -94,6 +94,14 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
     private boolean ignoreUnusedRuntime;
 
     /**
+     * Ignore Runtime scope for unused dependency analysis.
+     *
+     * @since 3.8.2
+     */
+    @Parameter(property = "ignoreUsedUndeclaredTest", defaultValue = "false")
+    private boolean ignoreUsedUndeclaredTest;
+
+    /**
      * Ignore all dependencies that are used only in test but not test-scoped. Setting
      * this flag has the same effect as adding all dependencies that have been flagged with
      * the <i>Non-test scoped test only dependencies found</i> warning to the
@@ -358,6 +366,9 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
 
         if (ignoreUnusedRuntime) {
             filterArtifactsByScope(unusedDeclared, Artifact.SCOPE_RUNTIME);
+        }
+        if (ignoreUsedUndeclaredTest) {
+            filterArtifactsByScope(usedUndeclaredWithClasses.keySet(), Artifact.SCOPE_TEST);
         }
 
         ignoredUsedUndeclared.addAll(filterDependencies(usedUndeclaredWithClasses.keySet(), ignoredDependencies));
