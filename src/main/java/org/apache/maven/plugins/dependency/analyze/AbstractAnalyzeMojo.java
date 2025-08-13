@@ -263,6 +263,16 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
     private Set<String> excludedClasses;
 
     /**
+     * List of dependency types that will be ignored.
+     * <br/>
+     * <b>Default value is<b>: <code>pom</code>
+     *
+     * @since 3.8.2
+     */
+    @Parameter(defaultValue = "pom")
+    private List<String> ignoredTypes;
+
+    /**
      * The plexusContainer to look up the {@link ProjectDependencyAnalyzer} implementation depending on the mojo
      * configuration.
      */
@@ -359,6 +369,9 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
         if (ignoreUnusedRuntime) {
             filterArtifactsByScope(unusedDeclared, Artifact.SCOPE_RUNTIME);
         }
+        if (!ignoredTypes.isEmpty()) {
+            filterArtifactsByTypes(unusedDeclared, ignoredTypes);
+        }
 
         ignoredUsedUndeclared.addAll(filterDependencies(usedUndeclaredWithClasses.keySet(), ignoredDependencies));
         ignoredUsedUndeclared.addAll(
@@ -451,6 +464,10 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
 
     private void filterArtifactsByScope(Set<Artifact> artifacts, String scope) {
         artifacts.removeIf(artifact -> artifact.getScope().equals(scope));
+    }
+
+    private void filterArtifactsByTypes(Set<Artifact> artifacts, List<String> types) {
+        artifacts.removeIf(artifact -> types.contains(artifact.getType()));
     }
 
     private void logArtifacts(Set<Artifact> artifacts, boolean warn) {
